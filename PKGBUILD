@@ -13,5 +13,5 @@ source=('https://raw.githubusercontent.com/tastyminerals/lls/master/lls')
 md5sums=('34008ed04fcf9d5538bff86552800b24')
 
 package() {
-  install -D -m 755 lls ${pkgdir}/usr/bin
+  install -D -m 755 lls ${pkgdir}/usr/bin/lls
 }
