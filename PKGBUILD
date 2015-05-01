@@ -1,15 +1,17 @@
 # Maintainer: tasty_minerals <tastyminerals@gmail.com>
 pkgname=lls
-pkgver=1.1
+pkgver=1.2
 pkgrel=1
-pkgdesc="(ls) command alternative, more colors and additional info, 
-check it out!"
+pkgdesc="lls is a colorful "ls" alternative with additional file info.
+lls provides pleasant colorful highlighting, file information and some easy-to-read permission tags.
+In addition lls can draw folder trees with a total files/dirs count."
 arch=(any)
-url="http://code.google.com/p/lls/"
+url="https://github.com/tastyminerals/lls"
 license=('MIT')
 depends=('file')
-source=('http://lls.googlecode.com/files/lls')
-md5sums=('82e1e78020c9fed07cd041cf5eead85c')
-build () {
-	install -D -m755 lls $pkgdir/usr/bin/lls
+source=('https://raw.githubusercontent.com/tastyminerals/lls/master/lls')
+md5sums=('ade8278d0f592d9bb3653a74c13c042d')
+
+package() {
+  install -D -m 755 lls ${pkgdir}/usr/bin
 }
