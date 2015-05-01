@@ -24,9 +24,9 @@ white="37;1"
 
 #color config
 if [ -f /home/$USER/.llsrc ]; then
-	source /home/$USER/.llsrc
+    source /home/$USER/.llsrc
 else 
-	echo -e "
+    echo -e "
 # lls colour config:
 # 
 # Avaliable colours:
@@ -86,229 +86,229 @@ feo_tag=\$light_purple
 #Not writable readable and(-a) executable file colours
 fz_file=\$dark_gray
 fz_tag=\$dark_gray" > /home/$USER/.llsrc
-	source /home/$USER/.llsrc
+    source /home/$USER/.llsrc
 fi
 
 if [ $lls_mode = "simple" ]; then
-	label1="DIR write/read"
-	label2="DIR closed"
-	label3="FILE write/read"
-	label4="FILE write/read/executable"
-	label5="FILE closed executable"
-	label6="FILE read only executable"
-	label7="FILE read only"
-	label8="FILE write only executable"
-	label9="FILE write only"
-	lable0="FILE zombie"
-	
+    label1="DIR write/read"
+    label2="DIR closed"
+    label3="FILE write/read"
+    label4="FILE write/read/executable"
+    label5="FILE closed executable"
+    label6="FILE read only executable"
+    label7="FILE read only"
+    label8="FILE write only executable"
+    label9="FILE write only"
+    lable0="FILE zombie"
+    
 elif [ $lls_mode = "default" ]; then
-	label1="DRWX"
-	label2="D---"
-	label3="-RW-"
-	label4="-RWX"
-	label5="---X"
-	label6="-R-X"
-	label7="-R--"
-	label8="--WX"
-	label9="--W-"
+    label1="DRWX"
+    label2="D---"
+    label3="-RW-"
+    label4="-RWX"
+    label5="---X"
+    label6="-R-X"
+    label7="-R--"
+    label8="--WX"
+    label9="--W-"
 label0="----"
 else 
-	echo "please, provide a valid TAG mode in ~/.llsrc!"
+    echo "please, provide a valid TAG mode in ~/.llsrc!"
 exit 0
 fi
 
 colorize()
 {
-	color="$1"
-	str="$2"
-	echo -e "\033[${color};148m${str}\033[39m"
-#	tput sgr0
+    color="$1"
+    str="$2"
+    echo -e "\033[${color};148m${str}\033[39m"
+#    tput sgr0
 }
 
 filter_x () {
-	if [ $SHOW_X -eq 1 -a $lls_mode  = "simple" ]; then
-		grep -E 'FILE (DRWX|-RWX|---X|-R-X|--WX|closed|read|write|executable)'
-	elif [ $NO_X -eq 1 -a $lls_mode  = "simple" ]; then
-		grep -E -v 'FILE (DRWX|-RWX|---X|-R-X|--WX|closed|read|write|executable)'
-	elif [ $SHOW_X -eq 1 -a $lls_mode  = "default" ]; then
-		grep -E '(DRWX|-RWX|---X|-R-X|--WX|closed|read|write)'
-	elif [ $NO_X -eq 1 -a $lls_mode  = "default" ]; then
-		grep -E -v '(DRWX|-RWX|---X|-R-X|--WX|closed|read|write)'	
-	else
-		cat
-	fi 	
+    if [ $SHOW_X -eq 1 -a $lls_mode  = "simple" ]; then
+        grep -E 'FILE (DRWX|-RWX|---X|-R-X|--WX|closed|read|write|executable)'
+    elif [ $NO_X -eq 1 -a $lls_mode  = "simple" ]; then
+        grep -E -v 'FILE (DRWX|-RWX|---X|-R-X|--WX|closed|read|write|executable)'
+    elif [ $SHOW_X -eq 1 -a $lls_mode  = "default" ]; then
+        grep -E '(DRWX|-RWX|---X|-R-X|--WX|closed|read|write)'
+    elif [ $NO_X -eq 1 -a $lls_mode  = "default" ]; then
+        grep -E -v '(DRWX|-RWX|---X|-R-X|--WX|closed|read|write)'    
+    else
+        cat
+    fi     
 }
 
 ######################################################################
 
 add_file_props()
 {
-	if [ $ADD_FILE_PROPS -eq 1 ]; then
-		echo -ne "$1"
-	fi
-	echo ""
-	tput sgr0
+    if [ $ADD_FILE_PROPS -eq 1 ]; then
+        echo -ne "$1"
+    fi
+    echo ""
+    tput sgr0
 }
 
 ######################################################################
 file_cnt ()
 {
-	files=$(find "$fname" -maxdepth 1 -type f | wc -l)
-	dirs=$(find "$fname" -maxdepth 1 -type d | wc -l)
-	tab=$tab$customtab
-	echo -e "($((dirs-1)) dirs, $files files)"
-	
+    files=$(find "$fname" -maxdepth 1 -type f | wc -l)
+    dirs=$(find "$fname" -maxdepth 1 -type d | wc -l)
+    tab=$tab$customtab
+    echo -e "($((dirs-1)) dirs, $files files)"
+    
 }
 
 findfunc ()
 {
-	shift
-	
-	tab=${tab#:}$customtab
-	for fname in $@; do
-		echo -e "$tab\___\033[34;1;148m${fname##*/}\033[39m \033[30;1;148m`file_cnt`\033[39m"
-		
-		if [ -d "$fname" ]; then
-			findfunc $(find "$fname" -maxdepth 1 -type d \( ! -iname ".*" \) | sort )
-		
-		fi
-		
-	done
-	tab=${tab%"$customtab"}
+    shift
+    
+    tab=${tab#:}$customtab
+    for fname in $@; do
+        echo -e "$tab\___\033[34;1;148m${fname##*/}\033[39m \033[30;1;148m`file_cnt`\033[39m"
+        
+        if [ -d "$fname" ]; then
+            findfunc $(find "$fname" -maxdepth 1 -type d \( ! -iname ".*" \) | sort )
+        
+        fi
+        
+    done
+    tab=${tab%"$customtab"}
 }
 
 tree_loop ()
 {
-	for fname in $cmd_filt_dirs; do
-		
-		fname=${fname##${PWD}/}
-		echo -e "\033[34;1;148m$fname\033[39m \033[30;6;148m`file_cnt`\033[39m" 
-#	tput sgr0
-		if [ -d $fname -a $fname != $curdir ]; then
-			findfunc $(find "$fname" -maxdepth 1 -type d \( ! -iname ".*" \) | sort)
-			
-		fi
-	
-	unset dir singletab tab
-	done
+    for fname in $cmd_filt_dirs; do
+        
+        fname=${fname##${PWD}/}
+        echo -e "\033[34;1;148m$fname\033[39m \033[30;6;148m`file_cnt`\033[39m" 
+#    tput sgr0
+        if [ -d $fname -a $fname != $curdir ]; then
+            findfunc $(find "$fname" -maxdepth 1 -type d \( ! -iname ".*" \) | sort)
+            
+        fi
+    
+    unset dir singletab tab
+    done
 
 }
 ######################################################################
 filter_types ()
 {
-	eval $cmd_list_files | 
-	while read files; do
-		file=$(file $files | awk "/$type_c$type_pic$type_m$type_doc$type_au/")
-		if [ ! -z $file ]; then
-			file=${file%%:*}
-			file_info $file
-		fi
-	done
-	exit 0
+    eval $cmd_list_files | 
+    while read files; do
+        file=$(file $files | awk "/$type_c$type_pic$type_m$type_doc$type_au/")
+        if [ ! -z $file ]; then
+            file=${file%%:*}
+            file_info $file
+        fi
+    done
+    exit 0
 }
 ######################################################################
 
 file_info ( )
 {
-	file=$1
-	
-	# dont bother computing stuff we will not use
-	if [ $ADD_FILE_PROPS -eq 1 ]; then
-		file_prop=$(file -b "$file")
-		file_size=$(ls -lh "$file" | awk '{print " "$5}')
-	fi
-	
-	fname=${file##$PWD/}
-	
-	# about directories
-	if [ -d "$file" ]; then
-		if [ -x "$file" ]; then
-			echo -n `colorize "$o_dir" "$fname"`
-			echo -n `colorize "$o_dir_tag" " > $label1"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}"`"
-		else
-			echo -n `colorize "$c_dir" "$fname"`
-			echo -n `colorize "$c_dir_tag" " > $label2"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}"`"
-		fi
-	fi
+    file=$1
+    
+    # dont bother computing stuff we will not use
+    if [ $ADD_FILE_PROPS -eq 1 ]; then
+        file_prop=$(file -b "$file")
+        file_size=$(ls -lh "$file" | awk '{print " "$5}')
+    fi
+    
+    fname=${file##$PWD/}
+    
+    # about directories
+    if [ -d "$file" ]; then
+        if [ -x "$file" ]; then
+            echo -n `colorize "$o_dir" "$fname"`
+            echo -n `colorize "$o_dir_tag" " > $label1"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}"`"
+        else
+            echo -n `colorize "$c_dir" "$fname"`
+            echo -n `colorize "$c_dir_tag" " > $label2"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}"`"
+        fi
+    fi
 
-	# about files
-	if [ -f "$file" ]; then
-		
-		if [ -r "$file" -a -w "$file" -a ! -x "$file" ]; then
-			echo -n `colorize "$fo_file" "$fname"`
-			echo -n `colorize "$fo_tag" " > $label3"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
-	
-		elif [ ! -w "$file" -a ! -r "$file" -a -x "$file" ]; then
-#			echo -ne "\033[31;2;148m${fname}\033[39m \033[31;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
-			echo -n `colorize "$fc_file" "$fname"`
-			echo -n `colorize "$fc_tag" " > $label5"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+    # about files
+    if [ -f "$file" ]; then
+        
+        if [ -r "$file" -a -w "$file" -a ! -x "$file" ]; then
+            echo -n `colorize "$fo_file" "$fname"`
+            echo -n `colorize "$fo_tag" " > $label3"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+    
+        elif [ ! -w "$file" -a ! -r "$file" -a -x "$file" ]; then
+#            echo -ne "\033[31;2;148m${fname}\033[39m \033[31;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
+            echo -n `colorize "$fc_file" "$fname"`
+            echo -n `colorize "$fc_tag" " > $label5"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
 
-		elif [ -w "$file" -a -r "$file" -a -x "$file" ]; then
-#			echo -ne "\033[33;2;148m${fname}\033[39m \033[33;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
-			echo -n `colorize "$fox_file" "$fname"`
-			echo -n `colorize "$fox_tag" " > $label4"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+        elif [ -w "$file" -a -r "$file" -a -x "$file" ]; then
+#            echo -ne "\033[33;2;148m${fname}\033[39m \033[33;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
+            echo -n `colorize "$fox_file" "$fname"`
+            echo -n `colorize "$fox_tag" " > $label4"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
 
-		elif [ ! -w "$file" -a -r "$file" -a -x "$file" ]; then
-#			echo -ne "\033[31;2;148m${fname}\033[39m \033[31;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
-			echo -n `colorize "$fsx_file" "$fname"`
-			echo -n `colorize "$fsx_tag" " > $label6"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+        elif [ ! -w "$file" -a -r "$file" -a -x "$file" ]; then
+#            echo -ne "\033[31;2;148m${fname}\033[39m \033[31;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
+            echo -n `colorize "$fsx_file" "$fname"`
+            echo -n `colorize "$fsx_tag" " > $label6"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
 
-		elif [ -w "$file" -a ! -r "$file" -a -x "$file" ]; then
-#			echo -ne "\033[35;2;148m${fname}\033[39m \033[35;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
-			echo -n `colorize "$fex_file" "$fname"`
-			echo -n `colorize "$fex_tag" " > $label8"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+        elif [ -w "$file" -a ! -r "$file" -a -x "$file" ]; then
+#            echo -ne "\033[35;2;148m${fname}\033[39m \033[35;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
+            echo -n `colorize "$fex_file" "$fname"`
+            echo -n `colorize "$fex_tag" " > $label8"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
 
-		elif [ -w "$file" -a ! -r "$file" -a ! -x "$file" ]; then
-#			echo -ne "\033[35;2;148m${fname}\033[39m \033[35;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
-			echo -n `colorize "$feo_file" "$fname"`
-			echo -n `colorize "$feo_tag" " > $label9"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+        elif [ -w "$file" -a ! -r "$file" -a ! -x "$file" ]; then
+#            echo -ne "\033[35;2;148m${fname}\033[39m \033[35;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
+            echo -n `colorize "$feo_file" "$fname"`
+            echo -n `colorize "$feo_tag" " > $label9"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
 
-		elif [ ! -w "$file" -a -r "$file" -a ! -x "$file" ]; then
-#			echo -ne "\033[31;2;148m${fname}\033[39m \033[31;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$fil     m e_prop}$file_size\033[39m"
-			echo -n `colorize "$fso_file" "$fname"`
-			echo -n `colorize "$fso_tag" " > $label7"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+        elif [ ! -w "$file" -a -r "$file" -a ! -x "$file" ]; then
+#            echo -ne "\033[31;2;148m${fname}\033[39m \033[31;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$fil     m e_prop}$file_size\033[39m"
+            echo -n `colorize "$fso_file" "$fname"`
+            echo -n `colorize "$fso_tag" " > $label7"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
 
-		elif [ ! -w "$file" -a ! -r "$file" -a ! -x "$file" ]; then
-#			echo -ne "\033[30;2;148m${fname}\033[39m \033[30;1;148m> ${label}\033[39m"
-#			add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
-			echo -n `colorize "$fz_file" "$fname"` 
-			echo -n `colorize "$fz_tag" " > $label0"`
-			tput sgr0
-			add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
-		fi
-	fi
+        elif [ ! -w "$file" -a ! -r "$file" -a ! -x "$file" ]; then
+#            echo -ne "\033[30;2;148m${fname}\033[39m \033[30;1;148m> ${label}\033[39m"
+#            add_file_props " \033[30;5;148m{$file_prop}$file_size\033[39m"
+            echo -n `colorize "$fz_file" "$fname"` 
+            echo -n `colorize "$fz_tag" " > $label0"`
+            tput sgr0
+            add_file_props " `colorize "$all_prop" "{$file_prop}$file_size"`"
+        fi
+    fi
 }
 
 ######################################################################
 
 usage() {
-	tput sgr0
+    tput sgr0
 
-	echo -e "
+    echo -e "
  Usage: lls [OPTION] PATH
  \"lls\" is a sript that works as \"ls\" with additional info on files spiced with some fancy colors.
  You can config your own colors in ~/.llsrc
@@ -329,7 +329,7 @@ usage() {
    -u, list all audio files only
    -z, make a pretty tree of folders      
 "
-	tput sgr0
+    tput sgr0
 }
 
 
@@ -350,87 +350,90 @@ if [[ "$curdir" != /* ]]; then
     curdir=$PWD
 fi
 
+unset name  # reseting $name in case it was set by environment
 while getopts :aefdxXpcvuthz opt; do
-	case $opt in
-	a)
-		cmd_list_dirs=$cmd_unfilt_dirs
-        cmd_list_files=$cmd_unfilt_files
-		;;
-	e) 
-		ADD_FILE_PROPS=1
-		;;
-	f)
-		cmd_list_files=""
-		;;
-	d)
-		cmd_list_dirs=""
-		;;
-	x)
-		SHOW_X=1
-		;;
-	X)
-		NO_X=1
-		;;
-	h)
-		usage
-		exit 0
-		;;
-	z)
-		cmd_filt_dirs=$(find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort)
+    case $opt in
+    a)
+        cmd_filt_dirs='find "$curdir" -maxdepth 1 -type d | sort'
+        cmd_filt_files='find "$curdir" -maxdepth 1 -type f | sort'
+        ;;
+    e) 
+        ADD_FILE_PROPS=1
+        ;;
+    f)
+        cmd_filt_files='find "$curdir" -maxdepth 1 -type f \( ! -iname ".*" \) | sort'
+        ;;
+    d)
+        cmd_filt_dirs='find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort'
+        ;;
+    x)
+        SHOW_X=1
+        ;;
+    X)
+        NO_X=1
+        ;;
+    h)
+        usage
+        exit 0
+        ;;
+    z)
+        cmd_filt_dirs=$(find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort)
         tree_loop
         exit 0
-		;;
-	c)
-		type_c="Archive|archive|compressed"
-		FILT=1
-		;;
-	p)
-		type_pic="Image|image"
-		FILT=1
-		;;
-	v)
-		type_m="Video|video|Matroska|matroska|3GPP|3GPP2|AVC|movie|MPEG sequence|RealMedia"
-		FILT=1
-		;;
-	t)
-		type_doc="Document|document|Text|text|ASCII"
-		FILT=1
-		;;
-	u)
-		type_au="Audio|AAC|FLAC"
-		FILT=1
-		;;
+        ;;
+    c)
+        type_c="Archive|archive|compressed"
+        FILT=1
+        ;;
+    p)
+        type_pic="Image|image"
+        FILT=1
+        ;;
+    v)
+        type_m="Video|video|Matroska|matroska|3GPP|3GPP2|AVC|movie|MPEG sequence|RealMedia"
+        FILT=1
+        ;;
+    t)
+        type_doc="Document|document|Text|text|ASCII"
+        FILT=1
+        ;;
+    u)
+        type_au="Audio|AAC|FLAC"
+        FILT=1
+        ;;
+    *)
+        cmd_filt_files='find "$curdir" -maxdepth 1 -type f \( ! -iname ".*" \) | sort'
+        cmd_filt_dirs='find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort'
+        ;;
     \?)
         usage
         ;;
-	esac
+    esac
 done
 shift $((OPTIND-1))
 
-cmd_filt_dirs='find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort '
-cmd_filt_files='find "$curdir" -maxdepth 1 -type f \( ! -iname ".*" \) | sort '
-
-cmd_unfilt_dirs='find "$curdir" -maxdepth 1 -type d | sort '
-cmd_unfilt_files='find "$curdir" -maxdepth 1 -type f | sort '
+if [ $OPTIND -eq 1 ]; then
+    cmd_filt_files='find "$curdir" -maxdepth 1 -type f \( ! -iname ".*" \) | sort'
+    cmd_filt_dirs='find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort'
+fi
 
 cmd_list_dirs=$cmd_filt_dirs
 cmd_list_files=$cmd_filt_files
 
 if [ $FILT -eq 1 -a $SHOW_X -ne 1 -a $NO_X -ne 1 ]; then
-	filter_types
-	eval $cmd_list_dirs | 
-	while read files; do
-		file_info "$files" 
-	done
-	exit 0
+    filter_types
+    eval $cmd_list_dirs | 
+    while read files; do
+        file_info "$files" 
+    done
+    exit 0
 elif [ $SHOW_X -ne 1 -a $NO_X -ne 1 ]; then
-	eval $cmd_list_dirs | 
-	while read files; do
-		file_info "$files" 
-	done
+    eval $cmd_list_dirs | 
+    while read files; do
+        file_info "$files" 
+    done
 fi
-	eval $cmd_list_files |
-	while read files; do
-	file_info "$files"
+    eval $cmd_list_files |
+    while read files; do
+    file_info "$files"
 done | filter_x
-

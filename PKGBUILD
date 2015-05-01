@@ -10,7 +10,7 @@ url="https://github.com/tastyminerals/lls"
 license=('MIT')
 depends=('file')
 source=('https://raw.githubusercontent.com/tastyminerals/lls/master/lls')
-md5sums=('ade8278d0f592d9bb3653a74c13c042d')
+md5sums=('34008ed04fcf9d5538bff86552800b24')
 
 package() {
   install -D -m 755 lls ${pkgdir}/usr/bin
