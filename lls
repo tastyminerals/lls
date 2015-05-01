@@ -196,12 +196,13 @@ tree_loop ()
 ######################################################################
 filter_types ()
 {
+    types=${types#"\|"}
     eval $cmd_list_files |
     while read files; do
-        file=$(file $files | awk "/$type_c|$type_pic|$type_m|$type_doc|$type_au/")
-        if [ ! -z $file ]; then
-            file=${file%%:*}
-            file_info $file
+        matched=$(file "$files" | sed -n "/$types/p")
+        if [ ! -z $matched ]; then
+            matched=${matched%%:*}
+            file_info $matched
         fi
     done
     exit 0
@@ -350,8 +351,8 @@ LIST_DOC=0
 LIST_AU=0
 
 
-cmd_filt_files='find "$curdir" -maxdepth 1 -type f \( ! -iname ".*" \) | sort'
-cmd_filt_dirs='find "$curdir" -maxdepth 1 -type d \( ! -iname ".*" \) | sort'
+cmd_filt_files=""
+cmd_filt_dirs=""
 customtab=":\t"
 IFS="
 "
@@ -393,22 +394,32 @@ while getopts :aefdxXpcvuthz opt; do
         ;;
     c)
         LIST_ARC=1
+        ONLY_FILES=1
+        ONLY_DIRS=1
         FILT=1
         ;;
     p)
         LIST_PIC=1
+        ONLY_FILES=1
+        ONLY_DIRS=1
         FILT=1
         ;;
     v)
         LIST_M=1
+        ONLY_FILES=1
+        ONLY_DIRS=1
         FILT=1
         ;;
     t)
         LIST_DOC=1
+        ONLY_FILES=1
+        ONLY_DIRS=1
         FILT=1
         ;;
     u)
         LIST_AU=1
+        ONLY_FILES=1
+        ONLY_DIRS=1
         FILT=1
         ;;
     \?)
@@ -437,21 +448,20 @@ fi
 cmd_list_dirs=$cmd_filt_dirs
 cmd_list_files=$cmd_filt_files
 
-
 if [ $LIST_ARC -eq 1 ]; then
-    type_c="Archive|archive|compressed"
+    types="Archive\|archive\|compressed"
 fi
 if [ $LIST_PIC -eq 1 ]; then
-    type_pic="Image|image"
+    types=$types"\|Image\|image"
 fi
 if [ $LIST_M -eq 1 ]; then
-    type_m="Video|video|Matroska|matroska|3GPP|3GPP2|AVC|movie|MPEG sequence|RealMedia"
+    types=$types"\|Video\|video\|Matroska\|matroska\|3GPP\|3GPP2\|AVC\|movie\|MPEG sequence\|RealMedia"
 fi
 if [ $LIST_DOC -eq 1 ]; then
-    type_doc="Document|document|Text|text|ASCII"
+    types=$types"\|Document\|document\|Text\|text\|ASCII"
 fi
 if [ $LIST_AU -eq 1 ]; then
-    type_au="Audio|AAC|FLAC"
+    types=$types"\|Audio\|AAC\|FLAC"
 fi
 
 if [ $FILT -eq 1 -a $SHOW_X -ne 1 -a $NO_X -ne 1 ]; then

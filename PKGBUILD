@@ -1,6 +1,6 @@
 # Maintainer: tasty_minerals <tastyminerals@gmail.com>
 pkgname=lls
-pkgver=1.2
+pkgver=1.3
 pkgrel=1
 pkgdesc="lls is a colorful "ls" alternative with additional file info.
 lls provides pleasant colorful highlighting, file information and some easy-to-read permission tags.
