@@ -1,6 +1,6 @@
 # Maintainer: tasty_minerals <tastyminerals@gmail.com>
 pkgname=lls
-pkgver=1.3
+pkgver=1.5
 pkgrel=1
 pkgdesc="lls is a colorful "ls" alternative with additional file info.
 lls provides pleasant colorful highlighting, file information and some easy-to-read permission tags.
@@ -10,7 +10,7 @@ url="https://github.com/tastyminerals/lls"
 license=('MIT')
 depends=('file')
 source=('https://raw.githubusercontent.com/tastyminerals/lls/master/lls')
-md5sums=('ff1ee454134bce4d01f0b9bbfc0652b6')
+md5sums=('66fa410f1647700a2ba6ab0ebac52465')
 
 package() {
   install -D -m 755 lls ${pkgdir}/usr/bin/lls
